@@ -1,7 +1,6 @@
-cmake_minimum_required(VERSION 3.31)
+cmake_minimum_required(VERSION 3.10)
 project(gosdclock)
 
-find_package(X11 REQUIRED)
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(GTKMM REQUIRED gtkmm-3.0)
 
@@ -14,7 +13,7 @@ add_executable(gosdclock
   src/osd_window.cpp
   src/settings_window.cpp
 )
-target_link_libraries(gosdclock ${GTKMM_LIBRARIES} X11 Xext)
+target_link_libraries(gosdclock ${GTKMM_LIBRARIES})
 
 add_executable(gosdclock_settings
   src/config.cpp

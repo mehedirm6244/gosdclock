@@ -18,7 +18,6 @@ m_btn_cancel("Cancel")
   set_resizable(false);
 
   add(m_vbox_main);
-  show_all_children();
 
   /* Font Style */
   m_button_font.set_font_name(m_config.get_font_family());
@@ -101,6 +100,8 @@ m_btn_cancel("Cancel")
   m_actionbar.pack_start(m_btn_apply);
 
   m_vbox_main.pack_start(m_actionbar, Gtk::PackOptions::PACK_SHRINK);
+
+  show_all_children();
 
   /* Connect signals */
   m_btn_save.signal_clicked().connect(

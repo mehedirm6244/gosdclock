@@ -1,7 +1,7 @@
 # GOSDClock
 `gosdclock` is a utility program which shows the current time in the corner of the screen, written in gtkmm3 and C++.
 
-This program is originally inspired from ![kwin-effects-osdclock](https://store.kde.org/p/1253662).
+This program is originally inspired from [kwin-effects-osdclock](https://store.kde.org/p/1253662).
 
 ![Preview](assets/image.jpg)
 

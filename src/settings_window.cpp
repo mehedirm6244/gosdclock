@@ -2,154 +2,120 @@
 #include <iostream>
 
 SettingsWindow::SettingsWindow()
-: m_label_font_family("Font Family"),
-m_label_position("OSD Position"),
-m_label_timeformat("Time Format"),
-m_label_offset_x("Offset X"),
-m_label_offset_y("Offset Y"),
-m_btn_apply("Apply"),
-m_btn_save("Save"),
-m_btn_cancel("Cancel")
+: font_label("Font Family"),
+  position_label("OSD Position"),
+  time_format_label("Time Format"),
+  offset_x_label("Offset X"),
+  offset_y_label("Offset Y"),
+  apply_button("Apply"),
+  save_button("Save"),
+  cancel_button("Cancel")
 {
-  /* Set Window Properties */
+  /* Window Properties */
   set_title("GOSDClock Settings");
   set_default_size(300, 200);
   set_border_width(12);
-  set_resizable(false);
-
-  add(m_vbox_main);
 
   /* Font Style */
-  m_button_font.set_font_name(m_config.get_font_family());
-  m_button_font.set_show_size(false);
-  m_vbox_main.pack_start(m_label_font_family, Gtk::PackOptions::PACK_SHRINK);
-  m_vbox_main.pack_start(m_button_font, Gtk::PackOptions::PACK_SHRINK);
+  std::string raw_font_name = config.get_font_family() + " " + std::to_string(config.get_font_size());
+  font_button.set_font_name(raw_font_name);
+
+  main_layout.pack_start(font_label, Gtk::PackOptions::PACK_SHRINK);
+  main_layout.pack_start(font_button, Gtk::PackOptions::PACK_SHRINK);
 
   /* OSD Position */
-  m_combo_position.append("Top left");
-  m_combo_position.append("Top right");
-  m_combo_position.append("Bottom left");
-  m_combo_position.append("Bottom right");
+  for (int i = 0; i < static_cast<int>(GOSDClock_Config::OSDPosition::Count); ++i)
+    position_combo.append(GOSDClock_Config::OSD_POSITION_LABELS[i]);
 
-  // Set current position
-  switch(m_config.get_osd_position()) {
-    case Config_NS::DISPLAY_POSITION::TOP_LEFT:
-      m_combo_position.set_active_text("Top left");
-      break;
+  position_combo.set_active_text(
+    GOSDClock_Config::OSD_POSITION_LABELS[static_cast<int>(config.get_osd_position())]);
 
-    case Config_NS::DISPLAY_POSITION::TOP_RIGHT:
-      m_combo_position.set_active_text("Top right");
-      break;
-
-    case Config_NS::DISPLAY_POSITION::BOTTOM_LEFT:
-      m_combo_position.set_active_text("Bottom left");
-      break;
-
-    case Config_NS::DISPLAY_POSITION::BOTTOM_RIGHT:
-      m_combo_position.set_active_text("Bottom right");
-      break;
-  }
-
-  m_vbox_main.pack_start(m_label_position, Gtk::PackOptions::PACK_SHRINK);
-  m_vbox_main.pack_start(m_combo_position, Gtk::PackOptions::PACK_SHRINK);
+  main_layout.pack_start(position_label, Gtk::PackOptions::PACK_SHRINK);
+  main_layout.pack_start(position_combo, Gtk::PackOptions::PACK_SHRINK);
 
   /* Time Format */
-  m_combo_timeformat.append("12 Hour");
-  m_combo_timeformat.append("12 Hour (Sec)");
-  m_combo_timeformat.append("24 Hour");
-  m_combo_timeformat.append("24 Hour (Sec)");
+  for (int i = 0; i < static_cast<int>(GOSDClock_Config::TimeFormat::Count); ++i)
+    time_format_combo.append(GOSDClock_Config::TIME_FORMAT_LABELS[i]);
 
-  // Set current time format
-  switch(m_config.get_time_format()) {
-    case Config_NS::TIME_FORMAT::TWELVE_HR:
-      m_combo_timeformat.set_active_text("12 Hour");
-      break;
+  time_format_combo.set_active_text(
+    GOSDClock_Config::TIME_FORMAT_LABELS[static_cast<int>(config.get_time_format())]);
 
-    case Config_NS::TIME_FORMAT::TWELVE_HR_SEC:
-      m_combo_timeformat.set_active_text("12 Hour (Sec)");
-      break;
-
-    case Config_NS::TIME_FORMAT::TWENTYFOUR_HR:
-      m_combo_timeformat.set_active_text("24 Hour");
-      break;
-
-    case Config_NS::TIME_FORMAT::TWENTYFOUR_HR_SEC:
-      m_combo_timeformat.set_active_text("24 Hour (Sec)");
-      break;
-  }
-
-  m_vbox_main.pack_start(m_label_timeformat, Gtk::PackOptions::PACK_SHRINK);
-  m_vbox_main.pack_start(m_combo_timeformat, Gtk::PackOptions::PACK_SHRINK);
+  main_layout.pack_start(time_format_label, Gtk::PackOptions::PACK_SHRINK);
+  main_layout.pack_start(time_format_combo, Gtk::PackOptions::PACK_SHRINK);
 
   /* Offset */
-  m_spinbutton_offset_x.set_range(-10000, 10000); // I need to sleep
-  m_spinbutton_offset_x.set_increments(1, 1);
-  m_spinbutton_offset_x.set_value(m_config.get_offset_x());
-  m_vbox_main.pack_start(m_label_offset_x, Gtk::PackOptions::PACK_SHRINK);
-  m_vbox_main.pack_start(m_spinbutton_offset_x, Gtk::PackOptions::PACK_SHRINK);
+  offset_x_spin.set_range(-10000, 10000);
+  offset_x_spin.set_increments(1, 1);
+  offset_x_spin.set_value(config.get_offset_x());
+  main_layout.pack_start(offset_x_label, Gtk::PackOptions::PACK_SHRINK);
+  main_layout.pack_start(offset_x_spin, Gtk::PackOptions::PACK_SHRINK);
 
-  m_spinbutton_offset_y.set_range(-10000, 10000);
-  m_spinbutton_offset_y.set_increments(1, 1);
-  m_spinbutton_offset_y.set_value(m_config.get_offset_y());
-  m_vbox_main.pack_start(m_label_offset_y, Gtk::PackOptions::PACK_SHRINK);
-  m_vbox_main.pack_start(m_spinbutton_offset_y, Gtk::PackOptions::PACK_SHRINK);
+  offset_y_spin.set_range(-10000, 10000);
+  offset_y_spin.set_increments(1, 1);
+  offset_y_spin.set_value(config.get_offset_y());
+  main_layout.pack_start(offset_y_label, Gtk::PackOptions::PACK_SHRINK);
+  main_layout.pack_start(offset_y_spin, Gtk::PackOptions::PACK_SHRINK);
 
-  /* Buttons */
-  m_actionbar.pack_end(m_btn_save);
-  m_actionbar.pack_end(m_btn_cancel);
-  m_actionbar.pack_start(m_btn_apply);
+  /* Action Buttons */
+  action_bar.pack_end(save_button);
+  action_bar.pack_end(cancel_button);
+  action_bar.pack_start(apply_button);
 
-  m_vbox_main.pack_start(m_actionbar, Gtk::PackOptions::PACK_SHRINK);
+  main_layout.pack_start(action_bar, Gtk::PackOptions::PACK_SHRINK);
 
+  /* Show all widgets */
+  add(main_layout);
   show_all_children();
 
   /* Connect signals */
-  m_btn_save.signal_clicked().connect(
+  save_button.signal_clicked().connect(
     sigc::mem_fun(*this, &SettingsWindow::on_save_clicked));
-  m_btn_apply.signal_clicked().connect(
+  apply_button.signal_clicked().connect(
     sigc::mem_fun(*this, &SettingsWindow::on_apply_clicked));
-  m_btn_cancel.signal_clicked().connect(
+  cancel_button.signal_clicked().connect(
     sigc::mem_fun(*this, &SettingsWindow::on_cancel_clicked));
 }
 
+/* Apply configuration without closing */
 void SettingsWindow::on_apply_clicked() {
-  auto font_desc = m_button_font.get_font_name(); // e.g. "Monospace Bold 42"
+  /* Font */
+  std::string font_desc = font_button.get_font_name();
   Pango::FontDescription pango_font(font_desc);
 
-  m_config.set_font_family(pango_font.get_family());
-  m_config.set_font_size(pango_font.get_size() / Pango::SCALE); // Pango units → px
+  config.set_font_family(pango_font.get_family());
+  config.set_font_size(pango_font.get_size() / Pango::SCALE); // Pango units → px
 
-  std::string pos_text = m_combo_position.get_active_text();
-  if (pos_text == "Top left")
-    m_config.set_osd_position(Config_NS::TOP_LEFT);
-  else if (pos_text == "Top right")
-    m_config.set_osd_position(Config_NS::TOP_RIGHT);
-  else if (pos_text == "Bottom left")
-    m_config.set_osd_position(Config_NS::BOTTOM_LEFT);
-  else if (pos_text == "Bottom right")
-    m_config.set_osd_position(Config_NS::BOTTOM_RIGHT);
-  
-  std::string time_format_str = m_combo_timeformat.get_active_text();
-  if (time_format_str == "12 Hour")
-    m_config.set_time_format(Config_NS::TWELVE_HR);
-  if (time_format_str == "12 Hour (Sec)")
-    m_config.set_time_format(Config_NS::TWELVE_HR_SEC);
-  if (time_format_str == "24 Hour")
-    m_config.set_time_format(Config_NS::TWENTYFOUR_HR);
-  if (time_format_str == "24 Hour (Sec)")
-    m_config.set_time_format(Config_NS::TWENTYFOUR_HR_SEC);
+  /* OSD Position */
+  std::string pos_text = position_combo.get_active_text();
+  for (int i = 0; i < static_cast<int>(GOSDClock_Config::OSDPosition::Count); ++i)
+    if (pos_text == GOSDClock_Config::OSD_POSITION_LABELS[i]) {
+      config.set_osd_position(static_cast<GOSDClock_Config::OSDPosition>(i));
+      break;
+    }
 
-  m_config.set_offset_x(m_spinbutton_offset_x.get_value());
-  m_config.set_offset_y(m_spinbutton_offset_y.get_value());
+  /* Time Format */
+  std::string time_text = time_format_combo.get_active_text();
+  for (int i = 0; i < static_cast<int>(GOSDClock_Config::TimeFormat::Count); ++i)
+    if (time_text == GOSDClock_Config::TIME_FORMAT_LABELS[i]) {
+      config.set_time_format(static_cast<GOSDClock_Config::TimeFormat>(i));
+      break;
+    }
 
-  m_config.save();
+  /* Offsets */
+  config.set_offset_x(offset_x_spin.get_value());
+  config.set_offset_y(offset_y_spin.get_value());
+
+  /* Save changes to file */
+  config.save();
 }
 
+/* Save configuration and close window */
 void SettingsWindow::on_save_clicked() {
   on_apply_clicked();
   hide();
 }
 
+/* Discard changes and close window */
 void SettingsWindow::on_cancel_clicked() {
   hide();
 }

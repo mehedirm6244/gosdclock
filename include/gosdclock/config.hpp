@@ -2,64 +2,114 @@
 #define GOSDCLOCK_CONFIG_HPP
 
 #include <string>
+#include <array>
 #include <filesystem>
 
-namespace Config_NS {
-  enum DISPLAY_POSITION {
-    TOP_LEFT,
-    TOP_RIGHT,
-    BOTTOM_LEFT,
-    BOTTOM_RIGHT,
+namespace GOSDClock_Config {
+
+  /**
+   * Enum class representing on-screen display (OSD) position
+   */
+  enum class OSDPosition : int {
+    TopLeft,
+    TopRight,
+    BottomLeft,
+    BottomRight,
+    Count // Number of available positions
   };
 
-  enum TIME_FORMAT {
-    TWELVE_HR,
-    TWELVE_HR_SEC,
-    TWENTYFOUR_HR,
-    TWENTYFOUR_HR_SEC,
+  /**
+   * String labels for each OSD position
+   */
+  constexpr std::array<const char*, static_cast<int>(OSDPosition::Count)> OSD_POSITION_LABELS = {
+    "Top Left",
+    "Top Right",
+    "Bottom Left",
+    "Bottom Right"
   };
 
+  /**
+   * Enum class representing supported time formats.
+   */
+  enum class TimeFormat : int {
+    TwelveHour,
+    TwelveHourWithSeconds,
+    TwentyFourHour,
+    TwentyFourHourWithSeconds,
+    Count // Number of available formats
+  };
+
+  /**
+   * Human-readable labels for each time format.
+   */
+  constexpr std::array<const char*, static_cast<int>(TimeFormat::Count)> TIME_FORMAT_LABELS = {
+    "12 Hours",
+    "12 Hours (with seconds)",
+    "24 Hours",
+    "24 Hours (with seconds)"
+  };
+
+  /**
+   * strftime-compatible format placeholders for each time format.
+   */
+  constexpr std::array<const char*, static_cast<int>(TimeFormat::Count)> TIME_FORMAT_PATTERNS = {
+    "%I:%M %p",       // 12-hours
+    "%I:%M:%S %p",    // 12-hours (with seconds)
+    "%H:%M",          // 24-hours
+    "%H:%M:%S"        // 24-hours (with seconds)
+  };
+
+  /**
+   * Configuration class for the OSD clock.
+   * Stores user preferences like position, font, and time format.
+   */
   class Config {
   private:
-    std::filesystem::path m_config_path;
+    std::filesystem::path config_file_path;
 
-    /* Configuration */
-    int offset_x; // (px)
-    int offset_y; // (px)
-    DISPLAY_POSITION osd_position;
+    /* Position offsets (in pixels) */
+    int horizontal_offset;  
+    int vertical_offset;    
 
-    int font_size; // (px)
-    std::string font_family;
+    /* OSD window position */
+    OSDPosition osd_position;
 
-    TIME_FORMAT time_format;
-    std::string time_format_placeholder;
+    /* Font configuration */
+    int font_size_px;
+    std::string font_family_name;
+
+    /* Time formatting */
+    TimeFormat time_format_type;
+    std::string time_format_pattern;
 
   public:
     Config();
     ~Config() = default;
-    std::string get_config_path();
 
-    /* Getter functions */
-    inline int get_font_size() { return font_size; }
-    inline int get_offset_x() { return offset_x; }
-    inline int get_offset_y() { return offset_y; }
-    inline DISPLAY_POSITION get_osd_position() { return osd_position; }
-    inline TIME_FORMAT get_time_format() { return time_format; }
-    inline std::string get_time_format_placeholder() { return time_format_placeholder; }
-    inline std::string get_font_family() { return font_family; }
+    /* Getters Function */
+    inline int get_font_size() const { return font_size_px; }
+    inline int get_offset_x() const { return horizontal_offset; }
+    inline int get_offset_y() const { return vertical_offset; }
+    inline OSDPosition get_osd_position() const { return osd_position; }
+    inline TimeFormat get_time_format() const { return time_format_type; }
+    inline const std::string& get_time_format_pattern() const { return time_format_pattern; }
+    inline const std::string& get_font_family() const { return font_family_name; }
+    inline const std::filesystem::path& get_config_path() const { return config_file_path; }
 
-    /* Setter functions */
-    inline void set_font_size(const int sz) { font_size = sz; }
-    inline void set_offset_x(const int offset) { offset_x = offset; }
-    inline void set_offset_y(const int offset) { offset_y = offset; }
-    inline void set_osd_position(DISPLAY_POSITION pos) { osd_position = pos; }
-    inline void set_time_format(TIME_FORMAT format) { time_format = format; }
-    inline void set_time_format_placeholder(std::string& format) { time_format_placeholder = format; }
-    inline void set_font_family(const std::string& name) { font_family = name; }
+    /* Setters Functions */
+    inline void set_font_size(int new_size) { font_size_px = new_size; }
+    inline void set_offset_x(int new_offset) { horizontal_offset = new_offset; }
+    inline void set_offset_y(int new_offset) { vertical_offset = new_offset; }
+    inline void set_osd_position(OSDPosition new_position) { osd_position = new_position; }
+    inline void set_time_format(TimeFormat new_format) { time_format_type = new_format; }
+    inline void set_time_format_pattern(const std::string& new_pattern) { time_format_pattern = new_pattern; }
+    inline void set_font_family(const std::string& new_family) { font_family_name = new_family; }
 
-    void save() const;
-    void load();
+    /* Persistence */
+    void save() const;  // Save configuration to file
+    void load();        // Load configuration from file
   };
-}
 
-#endif // OSDCLOCK_CONFIG_HPP
+} // namespace Config_NS
+
+#endif // GOSDCLOCK_CONFIG_HPP

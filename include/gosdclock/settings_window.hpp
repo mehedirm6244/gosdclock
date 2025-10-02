@@ -4,45 +4,48 @@
 #include <gtkmm.h>
 #include <gosdclock/config.hpp>
 
+/**
+ * @class SettingsWindow
+ * @brief A window that allows the user to configure gosdclock settings,
+ *        such as font, OSD position, time format, and offsets.
+ */
 class SettingsWindow : public Gtk::Window {
 public:
   SettingsWindow();
   ~SettingsWindow() = default;
 
 private:
-  Config_NS::Config m_config;
-  std::filesystem::path m_config_path;
+  /* Configuration */
+  GOSDClock_Config::Config config;          // Local copy of configuration
 
-  /* Widgets */
+  /* Layout Containers */
+  Gtk::Box main_layout{Gtk::Orientation::ORIENTATION_VERTICAL, 10};
 
-  /* Main container */
-  Gtk::Box m_vbox_main{Gtk::Orientation::ORIENTATION_VERTICAL, 10};
+  /* Font Selection Widgets */
+  Gtk::Label font_label;
+  Gtk::FontButton font_button;
 
-  /* Font widgets */
-  Gtk::Label m_label_font_family;
-  Gtk::FontButton m_button_font;
+  /* OSD Position Widgets */
+  Gtk::Label position_label;
+  Gtk::ComboBoxText position_combo;
 
-  /* OSD position widgets */
-  Gtk::Label m_label_position;
-  Gtk::ComboBoxText m_combo_position;
+  /* Time Format Widgets */
+  Gtk::Label time_format_label;
+  Gtk::ComboBoxText time_format_combo;
 
-  /* Time format widgets */
-  Gtk::Label m_label_timeformat;
-  Gtk::ComboBoxText m_combo_timeformat;
+  /* Offset Widgets */
+  Gtk::Label offset_x_label;
+  Gtk::Label offset_y_label;
+  Gtk::SpinButton offset_x_spin;
+  Gtk::SpinButton offset_y_spin;
 
-  /* Offset widgets */
-  Gtk::Label m_label_offset_x;
-  Gtk::Label m_label_offset_y;
-  Gtk::SpinButton m_spinbutton_offset_x;
-  Gtk::SpinButton m_spinbutton_offset_y;
+  /* Action Bar (Buttons) */
+  Gtk::ActionBar action_bar;
+  Gtk::Button save_button;
+  Gtk::Button apply_button;
+  Gtk::Button cancel_button;
 
-  /* Actionbar and children */
-  Gtk::ActionBar m_actionbar;
-  Gtk::Button m_btn_save;
-  Gtk::Button m_btn_apply;
-  Gtk::Button m_btn_cancel;
-
-  // Signals
+  /* Signal Handlers */
   void on_save_clicked();
   void on_apply_clicked();
   void on_cancel_clicked();

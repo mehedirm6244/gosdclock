@@ -60,5 +60,5 @@ Example `gtk.css`
 ```
 
 ## Known Bugs
-- Flickering when hovered (expected behavior). Need X11 and Wayland-specific fixes
+- Flickering when hovered (expected behavior). Needs X11 and Wayland-specific fixes
 - Disappears when fullscreen is activated for any window. Requires X11 and wayland-specific fixes

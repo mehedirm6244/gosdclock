@@ -13,15 +13,14 @@ SettingsWindow::SettingsWindow()
 {
   /* Window Properties */
   set_title("GOSDClock Settings");
-  set_default_size(300, 200);
+  set_size_request(-1, -1);
+  set_resizable(false);
   set_border_width(12);
 
   /* Font Style */
   std::string raw_font_name = config.get_font_family() + " " + std::to_string(config.get_font_size());
   font_button.set_font_name(raw_font_name);
-
-  main_layout.pack_start(font_label, Gtk::PackOptions::PACK_SHRINK);
-  main_layout.pack_start(font_button, Gtk::PackOptions::PACK_SHRINK);
+  font_button.set_tooltip_text("Choose the font family and size for the clock.");
 
   /* OSD Position */
   for (int i = 0; i < static_cast<int>(GOSDClock_Config::OSDPosition::Count); ++i)
@@ -29,9 +28,7 @@ SettingsWindow::SettingsWindow()
 
   position_combo.set_active_text(
     GOSDClock_Config::OSD_POSITION_LABELS[static_cast<int>(config.get_osd_position())]);
-
-  main_layout.pack_start(position_label, Gtk::PackOptions::PACK_SHRINK);
-  main_layout.pack_start(position_combo, Gtk::PackOptions::PACK_SHRINK);
+  position_combo.set_tooltip_text("Select where on screen the clock will appear.");
 
   /* Time Format */
   for (int i = 0; i < static_cast<int>(GOSDClock_Config::TimeFormat::Count); ++i)
@@ -39,32 +36,51 @@ SettingsWindow::SettingsWindow()
 
   time_format_combo.set_active_text(
     GOSDClock_Config::TIME_FORMAT_LABELS[static_cast<int>(config.get_time_format())]);
+  time_format_combo.set_tooltip_text("Choose between 12-hour and 24-hour formats.");
 
-  main_layout.pack_start(time_format_label, Gtk::PackOptions::PACK_SHRINK);
-  main_layout.pack_start(time_format_combo, Gtk::PackOptions::PACK_SHRINK);
-
-  /* Offset */
+  /* Offset Controls */
   offset_x_spin.set_range(-10000, 10000);
   offset_x_spin.set_increments(1, 1);
   offset_x_spin.set_value(config.get_offset_x());
-  main_layout.pack_start(offset_x_label, Gtk::PackOptions::PACK_SHRINK);
-  main_layout.pack_start(offset_x_spin, Gtk::PackOptions::PACK_SHRINK);
+  offset_x_spin.set_tooltip_text("Horizontal offset of the clock (pixels).");
 
   offset_y_spin.set_range(-10000, 10000);
   offset_y_spin.set_increments(1, 1);
   offset_y_spin.set_value(config.get_offset_y());
-  main_layout.pack_start(offset_y_label, Gtk::PackOptions::PACK_SHRINK);
-  main_layout.pack_start(offset_y_spin, Gtk::PackOptions::PACK_SHRINK);
+  offset_y_spin.set_tooltip_text("Vertical offset of the clock (pixels).");
+
+  /* Main Grid Layout */
+  grid.set_row_spacing(8);
+  grid.set_column_spacing(12);
+
+  grid.set_margin_start(12);
+  grid.set_margin_end(12);
+  grid.set_margin_top(12);
+  grid.set_margin_bottom(12);
+
+  grid.attach(font_label,        0, 0, 1, 1);
+  grid.attach(font_button,       1, 0, 1, 1);
+
+  grid.attach(position_label,    0, 1, 1, 1);
+  grid.attach(position_combo,    1, 1, 1, 1);
+
+  grid.attach(time_format_label, 0, 2, 1, 1);
+  grid.attach(time_format_combo, 1, 2, 1, 1);
+
+  grid.attach(offset_x_label,    0, 3, 1, 1);
+  grid.attach(offset_x_spin,     1, 3, 1, 1);
+
+  grid.attach(offset_y_label,    0, 4, 1, 1);
+  grid.attach(offset_y_spin,     1, 4, 1, 1);
 
   /* Action Buttons */
-  action_bar.pack_end(save_button);
-  action_bar.pack_end(cancel_button);
-  action_bar.pack_start(apply_button);
+  action_bar.pack_start(apply_button, Gtk::PACK_SHRINK);
+  action_bar.pack_end(save_button, Gtk::PACK_SHRINK);
+  action_bar.pack_end(cancel_button, Gtk::PACK_SHRINK);
 
-  main_layout.pack_start(action_bar, Gtk::PackOptions::PACK_SHRINK);
+  grid.attach(action_bar, 0, 5, 2, 1);
 
-  /* Show all widgets */
-  add(main_layout);
+  add(grid);
   show_all_children();
 
   /* Connect signals */

@@ -19,7 +19,7 @@ private:
   GOSDClock_Config::Config config;          // Local copy of configuration
 
   /* Layout Containers */
-  Gtk::Box main_layout{Gtk::Orientation::ORIENTATION_VERTICAL, 10};
+  Gtk::Grid grid;
 
   /* Font Selection Widgets */
   Gtk::Label font_label;
@@ -40,7 +40,8 @@ private:
   Gtk::SpinButton offset_y_spin;
 
   /* Action Bar (Buttons) */
-  Gtk::ActionBar action_bar;
+  // Gtk::ActionBar action_bar;
+  Gtk::Box action_bar{Gtk::ORIENTATION_HORIZONTAL, 10};       // For consistency
   Gtk::Button save_button;
   Gtk::Button apply_button;
   Gtk::Button cancel_button;
